@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locator 
+  labels:
+    app.kubernetes.io/name: locator 
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: locator 
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: locator 
+    spec:
+      volumes:
+        - name: cookies-google-com
+          secret:
+            secretName: cookies-google-com
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: locator 
+          image: lelandsindt/locator:v1 
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOOP_DELAY 
+              value: "300"
+            - name: COOKIES_FILE 
+              value: /.secrets/gcp/cookies-google-com.txt
+            - name: GMAIL_EMAIL 
+              valueFrom:
+                secretKeyRef:
+                  name: secrets 
+                  key: GMAIL_EMAIL 
+            - name: ADAFRUIT_IO_KEY 
+              valueFrom:
+                secretKeyRef:
+                  name: secrets 
+                  key: ADAFRUIT_IO_KEY 
+            - name: ADAFRUIT_IO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secrets 
+                  key: ADAFRUIT_IO_USERNAME
+            - name: PERSON_FEED 
+              valueFrom:
+                secretKeyRef:
+                  name: secrets 
+                  key: PERSON_FEED
+          volumeMounts:
+            - name: cookies-google-com
+              mountPath: /.secrets/gcp/cookies-google-com.txt
+              subPath: cookies-google-com.txt

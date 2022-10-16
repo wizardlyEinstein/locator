@@ -1,0 +1,8 @@
+namespace: locator 
+
+resources:
+- locator.yaml 
+
+generators:
+- secrets.yaml
+- cookies.yaml
